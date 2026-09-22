@@ -170,25 +170,20 @@ namespace UnoGame
 
                 if (playedCard != null)
                 {
+                    CardSlam();
                     topCard = playedCard;
                     discardPile.Add(topCard);
 
                     // 6: Regel - Meddela när spelaren har 1 kort kvar (UNO!)
                     if (current.Hand.Count == 1)
                     {
-                        Console.ForegroundColor = ConsoleColor.Magenta;
-                        Console.WriteLine($"\n*** UNO! {current.Name} har bara 1 kort kvar! ***\n");
-                        Console.ResetColor();
+                        UnoBanner();
                     }
 
                     // 8: Logik - Utse vinnare och avsluta
                     if (current.Hand.Count == 0)
                     {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("\n==================================");
-                        Console.WriteLine($"GRATTIS! {current.Name} vinner spelet!");
-                        Console.WriteLine("==================================");
-                        Console.ResetColor();
+                        WinAnimation(current.Name);
                         gameRunning = false;
                         break;
                     }
@@ -196,17 +191,18 @@ namespace UnoGame
                     // 7: Regel - Utlös specialkortseffekter
                     if (playedCard.Type == CardType.Skip)
                     {
-                        Console.WriteLine("Hoppa över! Nästa spelare förlorar sin tur.");
+                        SkipEffect();
                         currentPlayerIndex = GetNextIndex(currentPlayerIndex, direction, players.Count);
                     }
                     else if (playedCard.Type == CardType.Reverse)
                     {
-                        Console.WriteLine("Vänd! Spelriktningen ändras.");
+                        ReverseEffect();
                         direction *= -1;
                     }
                     else if (playedCard.Type == CardType.DrawTwo)
                     {
                         int nextPlayer = GetNextIndex(currentPlayerIndex, direction, players.Count);
+                        DrawTwoEffect();
                         Console.WriteLine($"{players[nextPlayer].Name} måste dra 2 kort och hoppa över sin tur!");
                         players[nextPlayer].Hand.Add(DrawCard(deck));
                         players[nextPlayer].Hand.Add(DrawCard(deck));
@@ -266,6 +262,102 @@ namespace UnoGame
             Card card = deck[0];
             deck.RemoveAt(0);
             return card;
+        }
+
+        // Coola effekter
+        static void Flash(string text, ConsoleColor color, int times = 3)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                Console.ForegroundColor = color;
+                Console.Write("\r" + text);
+                System.Threading.Thread.Sleep(150);
+                Console.Write("\r" + new string(' ', text.Length));
+                System.Threading.Thread.Sleep(100);
+            }
+            Console.ForegroundColor = color;
+            Console.WriteLine("\r" + text);
+            Console.ResetColor();
+        }
+
+        static void TypeWriter(string text, int delayMs = 20)
+        {
+            foreach (char c in text)
+            {
+                Console.Write(c);
+                System.Threading.Thread.Sleep(delayMs);
+            }
+            Console.WriteLine();
+        }
+
+        static void CardSlam()
+        {
+            string[] frames = { "   ", " > ", ">> ", ">>>" };
+            foreach (var f in frames)
+            {
+                Console.Write("\r" + f);
+                System.Threading.Thread.Sleep(60);
+            }
+            Console.Write("\r   \r");
+            Console.Beep(600, 80);
+        }
+
+        static void SkipEffect()
+        {
+            Console.Beep(300, 150);
+            Flash(">>> SKIP! <<<", ConsoleColor.Yellow, 2);
+        }
+
+        static void ReverseEffect()
+        {
+            Console.Beep(500, 100);
+            Console.Beep(400, 100);
+            Flash("<<< REVERSE! >>>", ConsoleColor.Cyan, 2);
+        }
+
+        static void DrawTwoEffect()
+        {
+            Console.Beep(200, 100);
+            Console.Beep(200, 100);
+            Flash("+2 DRAW TWO! +2", ConsoleColor.Red, 2);
+        }
+
+        static void UnoBanner()
+        {
+            ConsoleColor[] rainbow = { ConsoleColor.Red, ConsoleColor.Yellow, ConsoleColor.Green, ConsoleColor.Cyan, ConsoleColor.Magenta };
+            string text = "*** U N O ! ***";
+            Console.WriteLine();
+            for (int loop = 0; loop < 2; loop++)
+            {
+                foreach (var color in rainbow)
+                {
+                    Console.ForegroundColor = color;
+                    Console.Write("\r" + text);
+                    System.Threading.Thread.Sleep(80);
+                }
+            }
+            Console.WriteLine();
+            Console.ResetColor();
+            Console.Beep(800, 100);
+            Console.Beep(1000, 150);
+        }
+
+        static void WinAnimation(string name)
+        {
+            string[] confetti = { "🎉", "✨", "🎊", "★" };
+            Console.WriteLine();
+            for (int i = 0; i < 3; i++)
+            {
+                Console.ForegroundColor = (ConsoleColor)((i % 6) + 9);
+                Console.WriteLine(string.Concat(System.Linq.Enumerable.Repeat(confetti[i % confetti.Length] + " ", 15)));
+                System.Threading.Thread.Sleep(120);
+            }
+            Console.ResetColor();
+            TypeWriter($"GRATTIS! {name} VINNER SPELET!", 30);
+            Console.WriteLine(string.Concat(System.Linq.Enumerable.Repeat(confetti[0] + " ", 15)));
+            Console.Beep(660, 150);
+            Console.Beep(880, 150);
+            Console.Beep(1046, 250);
         }
 
         // 9: Skriv ut kort med konsolfärg baserat på kortfärg
