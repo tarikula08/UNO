@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace UnoGame
@@ -22,8 +22,8 @@ namespace UnoGame
         public bool CanPlayOn(Card topCard)
         {
             return Color == topCard.Color
-            || (Type == CardType.Number && topCard.Type == CardType.Number && Number == topCard.Number)
-            || (Type != CardType.Number && Type == topCard.Type);
+                || (Type == CardType.Number && topCard.Type == CardType.Number && Number == topCard.Number)
+                || (Type != CardType.Number && Type == topCard.Type);
         }
 
         public override string ToString()
@@ -35,10 +35,7 @@ namespace UnoGame
     public class Player
     {
         public string Name { get; set; }
-        public List<Card>
-            Hand
-        { get; set; } = new List<Card>
-                ();
+        public List<Card> Hand { get; set; } = new List<Card>();
 
         public Player(string name)
         {
@@ -63,17 +60,14 @@ namespace UnoGame
                 int.TryParse(Console.ReadLine(), out playerCount);
             }
 
-            List<Player>
-            players = new List<Player>
-                ();
+            List<Player> players = new List<Player>();
             for (int i = 1; i <= playerCount; i++)
             {
                 players.Add(new Player($"Spelare {i}"));
             }
 
             // 3: Skapa och blanda kortlek
-            List<Card>
-                deck = CreateDeck();
+            List<Card> deck = CreateDeck();
             Shuffle(deck);
 
             // 4: Dela ut 7 startkort per spelare
@@ -85,9 +79,7 @@ namespace UnoGame
                 }
             }
 
-            List<Card>
-                        discardPile = new List<Card>
-                            ();
+            List<Card> discardPile = new List<Card>();
             Card topCard = DrawCard(deck);
             discardPile.Add(topCard);
 
@@ -232,12 +224,9 @@ namespace UnoGame
             return next < 0 ? next + total : next;
         }
 
-        static List<Card>
-                                CreateDeck()
+        static List<Card> CreateDeck()
         {
-            List<Card>
-                deck = new List<Card>
-                    ();
+            List<Card> deck = new List<Card>();
             foreach (CardColor color in Enum.GetValues(typeof(CardColor)))
             {
                 for (int i = 0; i <= 9; i++)
@@ -256,8 +245,7 @@ namespace UnoGame
             return deck;
         }
 
-        static void Shuffle(List<Card>
-                                            deck)
+        static void Shuffle(List<Card> deck)
         {
             for (int i = deck.Count - 1; i > 0; i--)
             {
